@@ -1,5 +1,7 @@
 package lgs.l3
 
+import lgs.l3.model.Item
+
 /**
  * L3 - Leandro's Lightweight Locker, AKA Poor Man's S3
  * Basically my own, dumb, riskier, and production unsafe blob storage.

@@ -1,4 +1,4 @@
-package lgs.l3
+package lgs.l3.model
 
 import java.time.Instant
 

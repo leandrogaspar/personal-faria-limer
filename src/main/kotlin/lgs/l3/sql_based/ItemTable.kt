@@ -1,6 +1,6 @@
-package lgs.l3.impl
+package lgs.l3.sql_based
 
-import lgs.l3.Item
+import lgs.l3.model.Item
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import java.time.Instant
@@ -15,7 +15,7 @@ object ItemTable : Table() {
     override val primaryKey = PrimaryKey(key, version, name = "PK_Item")
 }
 
-fun ResultRow.item(): Item = Item(
+fun ResultRow.item() = Item(
     key = this[ItemTable.key],
     insertedAt = Instant.ofEpochMilli(this[ItemTable.insertedAt]),
     deletedAt = this[ItemTable.deletedAt]?.let { Instant.ofEpochMilli(it) },

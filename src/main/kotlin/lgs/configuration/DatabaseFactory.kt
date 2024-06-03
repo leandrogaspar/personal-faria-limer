@@ -2,7 +2,9 @@ package lgs.configuration
 
 import io.micronaut.context.annotation.Factory
 import jakarta.inject.Singleton
-import lgs.l3.impl.ItemTable
+import lgs.l3.sql_based.ItemTable
+import lgs.machado.sql_based.GroupConsumeTable
+import lgs.machado.sql_based.MessageTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.TransactionManager
@@ -28,7 +30,11 @@ class DatabaseFactory {
         // Todo: move to a better alternative. Maybe flyway?
         logger.info("Creating tables")
         transaction (db) {
-            SchemaUtils.create(ItemTable)
+            SchemaUtils.create(
+                ItemTable,
+                MessageTable,
+                GroupConsumeTable,
+            )
         }
         return db
     }

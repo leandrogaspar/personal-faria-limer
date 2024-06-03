@@ -1,38 +1,37 @@
-package lgs.l3.impl
+package lgs.l3.sql_based
 
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.extensions.clock.TestClock
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
-import lgs.l3.Item
-import java.io.File
-import java.nio.charset.Charset
+import lgs.l3.model.Item
+import lgs.test_helpers.cleanDbFile
+import lgs.test_helpers.createTestClock
+import lgs.test_helpers.randomByteArray
+import lgs.test_helpers.randomString
 import java.time.Instant
-import java.time.ZoneOffset
-import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-class InDatabaseL3Test(
+class SqlBasedL3Test(
 ): ShouldSpec() {
-    private val dbFile = "./in_database_l3_test.db"
+    private val dbFile = "./sql_based_l3.db"
     private val db by lazy {
-        cleanDbFile()
+        cleanDbFile(dbFile)
         DatabaseFactory().database(dbFile)
     }
 
     override fun afterSpec(f: suspend (Spec) -> Unit) {
         super.afterSpec(f)
-        cleanDbFile()
+        cleanDbFile(dbFile)
     }
 
     init {
         context("putItem") {
             should("store content with version 1 if it is the first item for the key") {
                 val clock = createTestClock()
-                val l3 = InDatabaseL3(db = db, clock = clock)
-                val key = mockKey()
-                val content = mockContent()
+                val l3 = SqlBasedL3(db = db, clock = clock)
+                val key = randomString()
+                val content = randomByteArray()
                 val item = l3.putItem(key, content)
                 item shouldBe Item(
                     key = key,
@@ -45,11 +44,11 @@ class InDatabaseL3Test(
 
             should("store content incrementing the version if it there is an existing item with the key") {
                 val clock = createTestClock()
-                val l3 = InDatabaseL3(db = db, clock = clock)
-                val key = mockKey()
+                val l3 = SqlBasedL3(db = db, clock = clock)
+                val key = randomString()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
-                    val content = mockContent()
+                    val content = randomByteArray()
                     val item = l3.putItem(key, content)
                     item shouldBe Item(
                         key = key,
@@ -65,10 +64,10 @@ class InDatabaseL3Test(
         context("getItem") {
             should("retrieve latest stored item when no version is provided") {
                 val clock = createTestClock()
-                val l3 = InDatabaseL3(db = db, clock = clock)
+                val l3 = SqlBasedL3(db = db, clock = clock)
 
-                val key = mockKey()
-                val content = mockContent()
+                val key = randomString()
+                val content = randomByteArray()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
                     l3.putItem(key, content)
@@ -86,18 +85,18 @@ class InDatabaseL3Test(
 
             should("return null when key is not found") {
                 val clock = createTestClock()
-                val l3 = InDatabaseL3(db = db, clock = clock)
-                val item = l3.getItem(mockKey())
+                val l3 = SqlBasedL3(db = db, clock = clock)
+                val item = l3.getItem(randomString())
                 item shouldBe null
             }
 
             should("retrieve deleted item") {
                 val clock = createTestClock()
                 val baseInstant = Instant.now(clock)
-                val l3 = InDatabaseL3(db = db, clock = clock)
+                val l3 = SqlBasedL3(db = db, clock = clock)
 
-                val key = mockKey()
-                val content = mockContent()
+                val key = randomString()
+                val content = randomByteArray()
                 l3.putItem(key, content)
 
                 clock.plus(10.seconds)
@@ -116,10 +115,10 @@ class InDatabaseL3Test(
             should("retrieve item with specific version") {
                 val clock = createTestClock()
                 val baseInstant = Instant.now(clock)
-                val l3 = InDatabaseL3(db = db, clock = clock)
+                val l3 = SqlBasedL3(db = db, clock = clock)
 
-                val key = mockKey()
-                val content = mockContent()
+                val key = randomString()
+                val content = randomByteArray()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
                     l3.putItem(key, content)
@@ -137,11 +136,11 @@ class InDatabaseL3Test(
 
             should("return null when version is not found") {
                 val clock = createTestClock()
-                val l3 = InDatabaseL3(db = db, clock = clock)
-                val key = mockKey()
+                val l3 = SqlBasedL3(db = db, clock = clock)
+                val key = randomString()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
-                    l3.putItem(key, mockContent())
+                    l3.putItem(key, randomByteArray())
                 }
                 val item = l3.getItem(key, version = 8)
                 item shouldBe null
@@ -152,9 +151,9 @@ class InDatabaseL3Test(
             should("mark the latest item as deleted") {
                 val clock = createTestClock()
                 val baseInstant = Instant.now(clock)
-                val l3 = InDatabaseL3(db = db, clock = clock)
-                val key = mockKey()
-                val content = mockContent()
+                val l3 = SqlBasedL3(db = db, clock = clock)
+                val key = randomString()
+                val content = randomByteArray()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
                     l3.putItem(key, content)
@@ -172,19 +171,10 @@ class InDatabaseL3Test(
 
             should("return null and be no-op if item is not found") {
                 val clock = createTestClock()
-                val l3 = InDatabaseL3(db = db, clock = clock)
-                val item = l3.deleteItem(mockKey())
+                val l3 = SqlBasedL3(db = db, clock = clock)
+                val item = l3.deleteItem(randomString())
                 item shouldBe null
             }
         }
     }
-
-    // We only store epochMilli in DB, so our Instant read from DB lacks the nano part. When comparing against our
-    // in memory Instant.now() the assertion would fail. Therefore, we truncate to milliSeconds.
-    // Todo: clean the Instant.ofEpochMilli(Instant.now().toEpochMilli()) hack - for some reason IntelliJ is
-    //   not picking ChronoUnit so I can't use Instant.now().truncatedTo(ChronoUnit.MILLIS) lol
-    private fun createTestClock() = TestClock(Instant.ofEpochMilli(Instant.now().toEpochMilli()), ZoneOffset.UTC)
-    private fun mockKey() = UUID.randomUUID().toString()
-    private fun mockContent() = UUID.randomUUID().toString().toByteArray(Charset.defaultCharset())
-    private fun cleanDbFile() = File(dbFile).delete()
 }

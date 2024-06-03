@@ -1,8 +1,8 @@
-package lgs.l3.impl
+package lgs.l3.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import lgs.l3.Item
+import lgs.l3.model.Item
 import lgs.l3.L3
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
@@ -11,9 +11,9 @@ import java.time.Clock
 import java.time.Instant
 
 @Singleton
-class InDatabaseL3(
+class SqlBasedL3(
     private val clock: Clock,
-    private val db: Database
+    private val db: Database,
 ) : L3 {
     override suspend fun putItem(key: String, content: ByteArray): Item {
         return newSuspendedTransaction(Dispatchers.IO, db) {
