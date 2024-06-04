@@ -23,12 +23,18 @@ class SqlBasedL3(
                 .limit(1)
                 .firstOrNull()?.item()
 
+            val newVersion = existingItem?.version?.inc() ?: 1
             ItemTable.insert {
                 it[this.key] = key
                 it[this.insertedAt] = nowAsEpochMilli()
-                it[this.version] = existingItem?.version?.inc() ?: 1
+                it[this.version] = newVersion
                 it[this.content] = ExposedBlob(content)
-            }.resultedValues!!.first().item()
+            }
+
+            ItemTable.selectAll()
+                .where { (ItemTable.key eq key) and (ItemTable.version eq newVersion) }
+                .limit(1)
+                .first().item()
         }
     }
 
