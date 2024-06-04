@@ -19,6 +19,8 @@ class SqlBasedL3Test(
         cleanDbFile(dbFile)
         DatabaseFactory().database(dbFile)
     }
+    private val clock by lazy { createTestClock() }
+    private val l3 by lazy { SqlBasedL3(db = db, clock = clock) }
 
     override fun afterSpec(f: suspend (Spec) -> Unit) {
         super.afterSpec(f)
@@ -28,8 +30,6 @@ class SqlBasedL3Test(
     init {
         context("putItem") {
             should("store content with version 1 if it is the first item for the key") {
-                val clock = createTestClock()
-                val l3 = SqlBasedL3(db = db, clock = clock)
                 val key = randomString()
                 val content = randomByteArray()
                 val item = l3.putItem(key, content)
@@ -43,8 +43,6 @@ class SqlBasedL3Test(
             }
 
             should("store content incrementing the version if it there is an existing item with the key") {
-                val clock = createTestClock()
-                val l3 = SqlBasedL3(db = db, clock = clock)
                 val key = randomString()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
@@ -63,9 +61,6 @@ class SqlBasedL3Test(
 
         context("getItem") {
             should("retrieve latest stored item when no version is provided") {
-                val clock = createTestClock()
-                val l3 = SqlBasedL3(db = db, clock = clock)
-
                 val key = randomString()
                 val content = randomByteArray()
                 for (i in (1..5)) {
@@ -84,17 +79,12 @@ class SqlBasedL3Test(
             }
 
             should("return null when key is not found") {
-                val clock = createTestClock()
-                val l3 = SqlBasedL3(db = db, clock = clock)
                 val item = l3.getItem(randomString())
                 item shouldBe null
             }
 
             should("retrieve deleted item") {
-                val clock = createTestClock()
                 val baseInstant = Instant.now(clock)
-                val l3 = SqlBasedL3(db = db, clock = clock)
-
                 val key = randomString()
                 val content = randomByteArray()
                 l3.putItem(key, content)
@@ -113,10 +103,7 @@ class SqlBasedL3Test(
             }
 
             should("retrieve item with specific version") {
-                val clock = createTestClock()
                 val baseInstant = Instant.now(clock)
-                val l3 = SqlBasedL3(db = db, clock = clock)
-
                 val key = randomString()
                 val content = randomByteArray()
                 for (i in (1..5)) {
@@ -135,8 +122,6 @@ class SqlBasedL3Test(
             }
 
             should("return null when version is not found") {
-                val clock = createTestClock()
-                val l3 = SqlBasedL3(db = db, clock = clock)
                 val key = randomString()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
@@ -149,9 +134,7 @@ class SqlBasedL3Test(
 
         context("deleteItem") {
             should("mark the latest item as deleted") {
-                val clock = createTestClock()
                 val baseInstant = Instant.now(clock)
-                val l3 = SqlBasedL3(db = db, clock = clock)
                 val key = randomString()
                 val content = randomByteArray()
                 for (i in (1..5)) {
@@ -170,8 +153,6 @@ class SqlBasedL3Test(
             }
 
             should("return null and be no-op if item is not found") {
-                val clock = createTestClock()
-                val l3 = SqlBasedL3(db = db, clock = clock)
                 val item = l3.deleteItem(randomString())
                 item shouldBe null
             }
