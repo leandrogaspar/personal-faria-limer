@@ -1,12 +1,9 @@
-package lgs.machado.producer
+package lgs.machado.sql_based
 
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
-import lgs.machado.sql_based.MessageTable
-import lgs.machado.sql_based.SqlBasedProducer
-import lgs.machado.sql_based.message
 import lgs.test_helpers.cleanDbFile
 import lgs.test_helpers.createTestClock
 import lgs.test_helpers.randomString

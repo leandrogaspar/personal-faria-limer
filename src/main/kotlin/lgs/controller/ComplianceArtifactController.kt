@@ -33,25 +33,3 @@ class ComplianceArtifactController(
             .created("sifafofas")
     }
 }
-
-@Singleton
-class ConsumerGroupA: Consumer {
-    private val logger: Logger = LoggerFactory.getLogger(ConsumerGroupA::class.java)
-    override fun group(): String = "GroupA"
-    override fun topic(): String = "test"
-    override suspend fun consumeMessages(messages: Set<Message>): Set<ConsumeFailure> {
-        logger.info("Consumed message ${messages.size}")
-        return emptySet()
-    }
-}
-
-@Singleton
-class ConsumerGroupB: Consumer {
-    private val logger: Logger = LoggerFactory.getLogger(ConsumerGroupB::class.java)
-    override fun group(): String = "GroupB"
-    override fun topic(): String = "test"
-    override suspend fun consumeMessages(messages: Set<Message>): Set<ConsumeFailure> {
-        logger.info("Consumed message ${messages.size}")
-        return emptySet()
-    }
-}

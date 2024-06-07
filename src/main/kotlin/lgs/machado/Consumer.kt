@@ -11,5 +11,5 @@ data class ConsumeFailure(
 interface Consumer {
     fun group(): String
     fun topic(): String
-    suspend fun consumeMessages(messages: Set<Message>): Set<ConsumeFailure>
+    suspend fun consumeMessages(messages: List<Message>): List<ConsumeFailure>
 }

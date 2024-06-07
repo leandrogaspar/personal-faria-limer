@@ -1,5 +1,6 @@
 package lgs.machado.sql_based
 
+import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import lgs.machado.Consumer
 import lgs.machado.core.ConsumerManager
@@ -12,6 +13,7 @@ import java.time.Clock
 import java.time.Instant
 import java.util.*
 
+@Singleton
 class SqlBasedConsumerManager(
     private val clock: Clock,
     private val db: Database,
@@ -20,32 +22,34 @@ class SqlBasedConsumerManager(
 
     override suspend fun consumeMessages(consumer: Consumer, maxPollSize: Int) {
         val messages = pollMessages(consumer, maxPollSize)
+        if (messages.isEmpty()) {
+            return
+        }
 
         // Todo: DLQ failures eventually?
         val failures = consumer.consumeMessages(messages)
         logger.debug("Failed to consume ${failures.size} messages on topic ${consumer.topic()} for group ${consumer.group()}")
         val failedMessageIds = failures.map { it.failedMessageId }
         val successes = messages.map { it.id }
-            .filter { failedMessageIds.contains(it)}
+            .filter { !failedMessageIds.contains(it)}
 
         markMessagesAsConsumed(consumer, successes)
     }
 
-    private suspend fun pollMessages(consumer: Consumer, maxPollSize: Int): Set<Message> {
+    private suspend fun pollMessages(consumer: Consumer, maxPollSize: Int): List<Message> {
         return newSuspendedTransaction(Dispatchers.IO, db) {
             MessageTable
                 .join(ConsumerTable, JoinType.LEFT) {
                     (MessageTable.id eq ConsumerTable.messageId) and
-                            (MessageTable.topic eq consumer.topic()) and
                             (ConsumerTable.topic eq consumer.topic()) and
                             (ConsumerTable.group eq consumer.group())
                 }
                 .selectAll()
-                .where { ConsumerTable.consumedAt.isNull() }
+                .where { MessageTable.topic eq consumer.topic() }
+                .andWhere { ConsumerTable.consumedAt.isNull() }
                 .orderBy(MessageTable.sentAt to SortOrder.ASC)
                 .limit(maxPollSize)
                 .map { it.message() }
-                .toSet()
         }
     }
 
