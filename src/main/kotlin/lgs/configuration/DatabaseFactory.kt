@@ -3,7 +3,7 @@ package lgs.configuration
 import io.micronaut.context.annotation.Factory
 import jakarta.inject.Singleton
 import lgs.l3.sql_based.ItemTable
-import lgs.machado.sql_based.GroupConsumeTable
+import lgs.machado.sql_based.ConsumerTable
 import lgs.machado.sql_based.MessageTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -33,7 +33,7 @@ class DatabaseFactory {
             SchemaUtils.create(
                 ItemTable,
                 MessageTable,
-                GroupConsumeTable,
+                ConsumerTable,
             )
         }
         return db

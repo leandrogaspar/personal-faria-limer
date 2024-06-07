@@ -8,6 +8,7 @@ import io.micronaut.http.multipart.CompletedFileUpload
 import jakarta.inject.Singleton
 import lgs.l3.L3
 import lgs.machado.Consumer
+import lgs.machado.ConsumeFailure
 import lgs.machado.Producer
 import lgs.machado.model.Message
 import org.slf4j.Logger
@@ -27,7 +28,7 @@ class ComplianceArtifactController(
         val uploadedItem = l3.putItem(UUID.randomUUID().toString(), artifact.bytes)
         val message = "payload ${counter++}"
         logger.info("Publishing message with payload: $message")
-        producer.send("test", message)
+        producer.produceMessage("test", message)
         return HttpResponse
             .created("sifafofas")
     }
@@ -36,19 +37,21 @@ class ComplianceArtifactController(
 @Singleton
 class ConsumerGroupA: Consumer {
     private val logger: Logger = LoggerFactory.getLogger(ConsumerGroupA::class.java)
-    override fun consumerGroup(): String = "GroupA"
-    override fun consumerTopic(): String = "test"
-    override suspend fun consumeMessage(message: Message) {
-        logger.info("Consumed message $message")
+    override fun group(): String = "GroupA"
+    override fun topic(): String = "test"
+    override suspend fun consumeMessages(messages: Set<Message>): Set<ConsumeFailure> {
+        logger.info("Consumed message ${messages.size}")
+        return emptySet()
     }
 }
 
 @Singleton
 class ConsumerGroupB: Consumer {
     private val logger: Logger = LoggerFactory.getLogger(ConsumerGroupB::class.java)
-    override fun consumerGroup(): String = "GroupB"
-    override fun consumerTopic(): String = "test"
-    override suspend fun consumeMessage(message: Message) {
-        logger.info("Consumed message $message")
+    override fun group(): String = "GroupB"
+    override fun topic(): String = "test"
+    override suspend fun consumeMessages(messages: Set<Message>): Set<ConsumeFailure> {
+        logger.info("Consumed message ${messages.size}")
+        return emptySet()
     }
 }
