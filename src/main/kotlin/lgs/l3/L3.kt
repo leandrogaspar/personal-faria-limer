@@ -16,6 +16,7 @@ interface L3 {
      * @return the added [Item].
      */
     suspend fun putItem(key: String, content: ByteArray): Item
+
     /**
      * Retrieves [Item] under the specified [key] and [version], or null if none is found.
      * @param [key] the unique key for the desired item.
@@ -23,6 +24,7 @@ interface L3 {
      * @return the [Item].
      */
     suspend fun getItem(key: String, version: Int? = null): Item?
+
     /**
      * Soft deletes [Item] under the specified [key]. If there is no [Item] for the given [key], this is a no-op.
      * If the [key] is found, the [Item.deletedAt] timestamp is updated.

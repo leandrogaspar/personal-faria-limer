@@ -12,7 +12,7 @@ fun createTrackingConsumer(
     group: String = randomString(),
     topic: String = randomString(),
 ): Consumer {
-    return object: Consumer {
+    return object : Consumer {
         override fun group() = group
         override fun topic() = topic
         override suspend fun consumeMessages(messages: List<Message>): List<ConsumeFailure> {

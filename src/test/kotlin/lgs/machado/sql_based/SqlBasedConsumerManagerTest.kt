@@ -13,7 +13,7 @@ import lgs.test_helpers.randomString
 import kotlin.time.Duration.Companion.seconds
 
 class SqlBasedConsumerManagerTest(
-): ShouldSpec() {
+) : ShouldSpec() {
     private val dbFile = "./sql_based_consumer_manager.db"
     private val db by lazy {
         cleanDbFile(dbFile)
@@ -57,7 +57,7 @@ class SqlBasedConsumerManagerTest(
             should("keep failures available for consume") {
                 val shouldFailMessage = "should_fail"
                 val messagesReceivedOnConsumer = mutableListOf<Message>()
-                val consumer = object: Consumer {
+                val consumer = object : Consumer {
                     private val topicAndGroup = randomString()
                     override fun group() = topicAndGroup
                     override fun topic() = topicAndGroup

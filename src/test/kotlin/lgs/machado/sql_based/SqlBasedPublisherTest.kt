@@ -11,7 +11,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class SqlBasedPublisherTest(
-): ShouldSpec() {
+) : ShouldSpec() {
     private val dbFile = "./sql_based_publisher.db"
     private val db by lazy {
         cleanDbFile(dbFile)

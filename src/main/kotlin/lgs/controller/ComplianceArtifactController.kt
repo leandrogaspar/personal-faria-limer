@@ -5,12 +5,8 @@ import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.multipart.CompletedFileUpload
-import jakarta.inject.Singleton
 import lgs.l3.L3
-import lgs.machado.Consumer
-import lgs.machado.ConsumeFailure
 import lgs.machado.Producer
-import lgs.machado.model.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*

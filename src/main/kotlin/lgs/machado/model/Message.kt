@@ -1,7 +1,7 @@
 package lgs.machado.model
 
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 data class Message(
     val id: UUID,

@@ -13,7 +13,7 @@ import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
 class SqlBasedL3Test(
-): ShouldSpec() {
+) : ShouldSpec() {
     private val dbFile = "./sql_based_l3.db"
     private val db by lazy {
         cleanDbFile(dbFile)
@@ -115,7 +115,7 @@ class SqlBasedL3Test(
                 item shouldBe Item(
                     key = key,
                     version = 3,
-                    insertedAt = baseInstant.plusSeconds(10*3),
+                    insertedAt = baseInstant.plusSeconds(10 * 3),
                     deletedAt = null,
                     content = content
                 )
@@ -146,7 +146,7 @@ class SqlBasedL3Test(
                 item shouldBe Item(
                     key = key,
                     version = 5,
-                    insertedAt = baseInstant.plusSeconds(10*5),
+                    insertedAt = baseInstant.plusSeconds(10 * 5),
                     deletedAt = Instant.now(clock),
                     content = content
                 )

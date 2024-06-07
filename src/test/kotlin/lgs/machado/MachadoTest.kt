@@ -12,7 +12,7 @@ import lgs.test_helpers.randomString
 class MachadoTest(
     private val producer: Producer,
     private val consumerScheduler: ConsumerScheduler,
-): ShouldSpec() {
+) : ShouldSpec() {
     init {
         context("Machado") {
             should("send and consume messages") {

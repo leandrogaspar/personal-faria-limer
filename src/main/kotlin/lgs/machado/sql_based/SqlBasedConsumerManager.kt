@@ -31,7 +31,7 @@ class SqlBasedConsumerManager(
         logger.debug("Failed to consume ${failures.size} messages on topic ${consumer.topic()} for group ${consumer.group()}")
         val failedMessageIds = failures.map { it.failedMessageId }
         val successes = messages.map { it.id }
-            .filter { !failedMessageIds.contains(it)}
+            .filter { !failedMessageIds.contains(it) }
 
         markMessagesAsConsumed(consumer, successes)
     }

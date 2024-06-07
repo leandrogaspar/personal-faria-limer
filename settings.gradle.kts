@@ -1,4 +1,2 @@
-
-
-rootProject.name="personal-faria-limer"
+rootProject.name = "personal-faria-limer"
 

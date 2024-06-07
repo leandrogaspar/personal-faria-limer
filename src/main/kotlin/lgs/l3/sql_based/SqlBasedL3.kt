@@ -2,8 +2,8 @@ package lgs.l3.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import lgs.l3.model.Item
 import lgs.l3.L3
+import lgs.l3.model.Item
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -45,6 +45,7 @@ class SqlBasedL3(
                     .where { ItemTable.key eq key }
                     .orderBy(ItemTable.version to SortOrder.DESC)
                     .limit(1)
+
                 else -> ItemTable.selectAll()
                     .where { (ItemTable.key eq key) and (ItemTable.version eq version) }
                     .orderBy(ItemTable.version to SortOrder.DESC)

@@ -8,7 +8,7 @@ import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 @MicronautTest
 class TestControllerTest(
     @Client("/") private val client: HttpClient,
-): FunSpec({
+) : FunSpec({
     test("testing L3") {
         val content = "this is a test"
     }

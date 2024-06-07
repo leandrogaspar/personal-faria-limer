@@ -2,7 +2,7 @@ package lgs.machado.sql_based
 
 import org.jetbrains.exposed.sql.Table
 
-object ConsumerTable: Table() {
+object ConsumerTable : Table() {
     val group = varchar("consumer_group", 1000)
     val topic = varchar("topic", 1000)
     val messageId = uuid("message_id")

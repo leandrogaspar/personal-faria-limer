@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.Table
 import java.time.Instant
 import java.util.*
 
-object MessageTable: Table() {
+object MessageTable : Table() {
     val id = uuid("id").clientDefault { UUID.randomUUID() }.uniqueIndex()
     val topic = varchar("topic", 255)
     val sentAt = long("sent_at")

@@ -1,7 +1,7 @@
 package lgs.machado
 
 import lgs.machado.model.Message
-import java.util.UUID
+import java.util.*
 
 data class ConsumeFailure(
     val failedMessageId: UUID,

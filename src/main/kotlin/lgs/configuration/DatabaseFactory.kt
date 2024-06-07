@@ -29,7 +29,7 @@ class DatabaseFactory {
 
         // Todo: move to a better alternative. Maybe flyway?
         logger.info("Creating tables")
-        transaction (db) {
+        transaction(db) {
             SchemaUtils.create(
                 ItemTable,
                 MessageTable,
