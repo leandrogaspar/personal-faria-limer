@@ -13,4 +13,7 @@ out/
 .settings
 .classpath
 .factorypath
+dbs/
 *.db
+*.db-shm
+*.db-wal

@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class SqlBasedPublisherTest(
 ) : ShouldSpec() {
-    private val dbFile = "./sql_based_publisher.db"
+    private val dbFile = "./dbs/sql_based_publisher.db"
     private val db by lazy {
         cleanDbFile(dbFile)
         DatabaseFactory().database(dbFile)

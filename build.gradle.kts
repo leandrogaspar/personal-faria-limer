@@ -5,6 +5,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.micronaut.application") version "4.4.0"
     id("io.micronaut.aot") version "4.4.0"
+    kotlin("plugin.serialization") version "1.9.23"
     jacoco
 }
 

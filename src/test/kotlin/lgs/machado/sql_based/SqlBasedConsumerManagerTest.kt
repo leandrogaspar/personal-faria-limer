@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class SqlBasedConsumerManagerTest(
 ) : ShouldSpec() {
-    private val dbFile = "./sql_based_consumer_manager.db"
+    private val dbFile = "./dbs/sql_based_consumer_manager.db"
     private val db by lazy {
         cleanDbFile(dbFile)
         DatabaseFactory().database(dbFile)

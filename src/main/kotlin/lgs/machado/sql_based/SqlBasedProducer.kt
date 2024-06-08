@@ -2,10 +2,10 @@ package lgs.machado.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import lgs.configuration.suspendedTransaction
 import lgs.machado.Producer
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.time.Clock
 import java.time.Instant
 
@@ -15,7 +15,7 @@ class SqlBasedProducer(
     private val db: Database,
 ) : Producer {
     override suspend fun produceMessage(topic: String, payload: String) {
-        return newSuspendedTransaction(Dispatchers.IO, db) {
+        return suspendedTransaction(Dispatchers.IO, db) {
             MessageTable.insert {
                 it[this.topic] = topic
                 it[this.sentAt] = nowAsEpochMilli()
