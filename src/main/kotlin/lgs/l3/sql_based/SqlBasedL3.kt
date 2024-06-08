@@ -4,6 +4,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
 import lgs.l3.L3
 import lgs.l3.model.Item
@@ -17,11 +18,11 @@ import java.time.Instant
 @Singleton
 class SqlBasedL3(
     private val clock: Clock,
-    private val db: Database,
+    private val db: Databases,
     private val producer: Producer,
 ) : L3 {
     override suspend fun putItem(folder: String, key: String, content: ByteArray): Item {
-        return suspendedTransaction(Dispatchers.IO, db) {
+        return suspendedTransaction(Dispatchers.IO, db.writer) {
             val existingItem = ItemTable.selectAll()
                 .where { (ItemTable.folder eq folder) and (ItemTable.key eq key) }
                 .orderBy(ItemTable.version to SortOrder.DESC)
@@ -47,7 +48,7 @@ class SqlBasedL3(
     }
 
     override suspend fun getItem(folder: String, key: String, version: Int?): Item? {
-        return suspendedTransaction(Dispatchers.IO, db) {
+        return suspendedTransaction(Dispatchers.IO, db.reader) {
             val query = when (version) {
                 null -> ItemTable.selectAll()
                     .where { (ItemTable.folder eq folder) and (ItemTable.key eq key) }
@@ -64,7 +65,7 @@ class SqlBasedL3(
     }
 
     override suspend fun deleteItem(folder: String, key: String): Item? {
-        return suspendedTransaction(Dispatchers.IO, db) {
+        return suspendedTransaction(Dispatchers.IO, db.writer) {
             val existingItem = ItemTable.selectAll()
                 .where { (ItemTable.folder eq folder) and (ItemTable.key eq key) }
                 .orderBy(ItemTable.version to SortOrder.DESC)

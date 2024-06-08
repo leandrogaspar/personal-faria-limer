@@ -1,5 +1,7 @@
 package lgs.configuration
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import io.micronaut.context.annotation.Factory
 import jakarta.inject.Singleton
 import lgs.l3.sql_based.ItemTable
@@ -15,8 +17,10 @@ import org.jetbrains.exposed.sql.transactions.experimental.withSuspendTransactio
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.sql.Connection
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
+
+data class Databases(val writer: Database, val reader: Database)
 
 @Factory
 class DatabaseFactory {
@@ -24,17 +28,29 @@ class DatabaseFactory {
     private val driver = "org.sqlite.JDBC"
 
     @Singleton
-    fun database(path: String?): Database {
-        val url = "jdbc:sqlite:${path ?: "./dbs/database.db?journal_mode=WAL"}"
+    fun database() = Databases(
+        writer = createDatabase(readOnly = false),
+        reader = createDatabase(readOnly = false),
+    )
 
-        logger.info("Connecting to url:$url with driver $driver")
+    fun createDatabase(
+        path: String? = "./dbs/database.db",
+        readOnly: Boolean = false,
+    ): Database {
+        val config = HikariConfig().apply {
+            jdbcUrl = "jdbc:sqlite:${path}?journal_mode=WAL"
+            driverClassName = driver
+            maximumPoolSize = if (readOnly) 10 else 1
+            isReadOnly = readOnly
+            transactionIsolation = "TRANSACTION_SERIALIZABLE"
+            connectionTimeout = 2.seconds.inWholeMilliseconds
+        }
+        val dataSource = HikariDataSource(config)
         val db = Database.connect(
-            url = url,
-            driver = driver,
+            datasource = dataSource,
             databaseConfig = DatabaseConfig {
                 useNestedTransactions = false
-                defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE
-            }
+            },
         )
 
         // Todo: move to a better alternative. Maybe flyway?

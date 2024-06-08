@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import lgs.machado.core.ConsumerManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
 
 @Singleton
 class ConsumerScheduler(
@@ -30,13 +31,21 @@ class ConsumerScheduler(
         consumers.add(consumer)
     }
 
+    private val consumeMap = ConcurrentHashMap<String, Boolean>()
+
     @Scheduled(fixedRate = "PT0.2S")
     fun pollAndConsumeMessages() {
         val maxPollSize = 10
         logger.debug("Scheduling ${consumers.size} consumers with a maxPollSize $maxPollSize")
         consumers.forEach { consumer ->
             scope.launch {
+                val key = "${consumer.group()}-${consumer.topic()}"
+                if (consumeMap.getOrDefault(key, false)) {
+                    return@launch
+                }
+                consumeMap[key] = true
                 consumerManager.consumeMessages(consumer, maxPollSize)
+                consumeMap.remove(key)
             }
         }
     }

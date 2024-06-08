@@ -4,6 +4,7 @@ import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
+import lgs.configuration.Databases
 import lgs.test_helpers.cleanDbFile
 import lgs.test_helpers.createTestClock
 import lgs.test_helpers.randomString
@@ -15,7 +16,7 @@ class SqlBasedPublisherTest(
     private val dbFile = "./dbs/sql_based_publisher.db"
     private val db by lazy {
         cleanDbFile(dbFile)
-        DatabaseFactory().database(dbFile)
+        DatabaseFactory().createDatabase(dbFile)
     }
 
     override fun afterSpec(f: suspend (Spec) -> Unit) {
@@ -27,7 +28,7 @@ class SqlBasedPublisherTest(
         context("send") {
             should("store message") {
                 val clock = createTestClock()
-                val publisher = SqlBasedProducer(db = db, clock = clock)
+                val publisher = SqlBasedProducer(db = Databases(db, db), clock = clock)
 
                 val topic = randomString()
                 val payload = randomString()

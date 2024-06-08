@@ -4,6 +4,7 @@ import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
+import lgs.configuration.Databases
 import lgs.l3.model.Item
 import lgs.machado.Producer
 import lgs.test_helpers.cleanDbFile
@@ -18,14 +19,14 @@ class SqlBasedL3Test(
     private val dbFile = "./dbs/sql_based_l3.db"
     private val db by lazy {
         cleanDbFile(dbFile)
-        DatabaseFactory().database(dbFile)
+        DatabaseFactory().createDatabase(dbFile)
     }
     private val clock by lazy { createTestClock() }
     private val producer = object : Producer {
         override suspend fun produceMessage(topic: String, payload: String) {
         }
     }
-    private val l3 by lazy { SqlBasedL3(db = db, clock = clock, producer = producer) }
+    private val l3 by lazy { SqlBasedL3(db = Databases(db, db), clock = clock, producer = producer) }
 
     override fun afterSpec(f: suspend (Spec) -> Unit) {
         super.afterSpec(f)

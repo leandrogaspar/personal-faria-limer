@@ -3,6 +3,7 @@ package lgs.machado.sql_based
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
+import lgs.configuration.Databases
 import lgs.machado.ConsumeFailure
 import lgs.machado.Consumer
 import lgs.machado.model.Message
@@ -17,11 +18,11 @@ class SqlBasedConsumerManagerTest(
     private val dbFile = "./dbs/sql_based_consumer_manager.db"
     private val db by lazy {
         cleanDbFile(dbFile)
-        DatabaseFactory().database(dbFile)
+        DatabaseFactory().createDatabase(dbFile)
     }
     private val clock by lazy { createTestClock() }
-    private val publisher by lazy { SqlBasedProducer(db = db, clock = clock) }
-    private val consumerManager by lazy { SqlBasedConsumerManager(db = db, clock = clock) }
+    private val publisher by lazy { SqlBasedProducer(db = Databases(db, db), clock = clock) }
+    private val consumerManager by lazy { SqlBasedConsumerManager(db = Databases(db, db), clock = clock) }
 
     init {
         context("consumeMessages") {

@@ -2,6 +2,7 @@ package lgs.machado.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
 import lgs.machado.Consumer
 import lgs.machado.core.ConsumerManager
@@ -16,7 +17,7 @@ import java.util.*
 @Singleton
 class SqlBasedConsumerManager(
     private val clock: Clock,
-    private val db: Database,
+    private val db: Databases,
 ) : ConsumerManager {
     private val logger: Logger = LoggerFactory.getLogger(SqlBasedConsumerManager::class.java)
 
@@ -37,7 +38,7 @@ class SqlBasedConsumerManager(
     }
 
     private suspend fun pollMessages(consumer: Consumer, maxPollSize: Int): List<Message> {
-        return suspendedTransaction(Dispatchers.IO, db) {
+        return suspendedTransaction(Dispatchers.IO, db.reader) {
             MessageTable
                 .join(ConsumerTable, JoinType.LEFT) {
                     (MessageTable.id eq ConsumerTable.messageId) and
@@ -54,7 +55,7 @@ class SqlBasedConsumerManager(
     }
 
     private suspend fun markMessagesAsConsumed(consumer: Consumer, messageIds: List<UUID>) {
-        return suspendedTransaction(Dispatchers.IO, db) {
+        return suspendedTransaction(Dispatchers.IO, db.writer) {
             ConsumerTable.batchInsert(messageIds) { messageId ->
                 this[ConsumerTable.group] = consumer.group()
                 this[ConsumerTable.topic] = consumer.topic()
