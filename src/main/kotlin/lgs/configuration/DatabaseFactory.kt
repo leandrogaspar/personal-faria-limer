@@ -7,6 +7,7 @@ import jakarta.inject.Singleton
 import lgs.object_storage.sql_based.ItemTable
 import lgs.publisher_consumer.sql_based.ConsumerTable
 import lgs.publisher_consumer.sql_based.MessageTable
+import lgs.workflow.WorkflowExecutionTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -60,6 +61,7 @@ class DatabaseFactory {
                 ItemTable,
                 MessageTable,
                 ConsumerTable,
+                WorkflowExecutionTable,
             )
         }
         return db
