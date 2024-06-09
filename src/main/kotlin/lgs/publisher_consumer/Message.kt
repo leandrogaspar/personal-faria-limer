@@ -1,4 +1,4 @@
-package lgs.machado
+package lgs.publisher_consumer
 
 import java.time.Instant
 import java.util.*

@@ -1,10 +1,10 @@
-package lgs.machado.sql_based
+package lgs.publisher_consumer.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
-import lgs.machado.Producer
+import lgs.publisher_consumer.Producer
 import org.jetbrains.exposed.sql.insert
 import java.time.Clock
 import java.time.Instant

@@ -1,6 +1,6 @@
-package lgs.machado.sql_based
+package lgs.publisher_consumer.sql_based
 
-import lgs.machado.Message
+import lgs.publisher_consumer.Message
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import java.time.Instant

@@ -1,4 +1,4 @@
-package lgs.machado.core
+package lgs.publisher_consumer.core
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.scheduling.annotation.Scheduled
@@ -7,7 +7,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import lgs.machado.Consumer
+import lgs.publisher_consumer.Consumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -39,7 +39,7 @@ class ConsumerScheduler(
         logger.debug("Scheduling ${consumers.size} consumers with a maxPollSize $maxPollSize")
         consumers.forEach { consumer ->
             scope.launch {
-                val key = "${consumer.group()}-${consumer.topic()}"
+                val key = "${consumer.group}-${consumer.topic}"
                 if (consumeMap.getOrDefault(key, false)) {
                     return@launch
                 }

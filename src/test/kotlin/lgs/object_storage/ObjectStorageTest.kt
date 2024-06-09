@@ -1,19 +1,19 @@
-package lgs.l3
+package lgs.object_storage
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
-import lgs.machado.core.ConsumerScheduler
-import lgs.machado.Message
+import lgs.publisher_consumer.Message
+import lgs.publisher_consumer.core.ConsumerScheduler
 import lgs.test_helpers.createTrackingConsumer
 import lgs.test_helpers.randomByteArray
 import lgs.test_helpers.randomString
 
 @MicronautTest
-class L3Test(
-    private val l3: L3,
+class ObjectStorageTest(
+    private val objectStorage: ObjectStorage,
     private val consumerScheduler: ConsumerScheduler,
 ) : ShouldSpec() {
     init {
@@ -26,11 +26,11 @@ class L3Test(
                 val consumedMessages = mutableListOf<Message>()
                 val consumer = createTrackingConsumer(
                     consumedMessagesTracker = consumedMessages,
-                    topic = "l3-ie-${folder}"
+                    topic = "obj-storage-ie-${folder}"
                 )
                 consumerScheduler.registerConsumer(consumer)
 
-                val item = l3.putItem(folder, key, content)
+                val item = objectStorage.putItem(folder, key, content)
                 delay(500)
                 consumedMessages.size shouldBe 1
                 val itemEvent = Json.decodeFromString(ItemEvent.serializer(), consumedMessages[0].payload)
@@ -51,13 +51,13 @@ class L3Test(
                 val consumedMessages = mutableListOf<Message>()
                 val consumer = createTrackingConsumer(
                     consumedMessagesTracker = consumedMessages,
-                    topic = "l3-ie-${folder}"
+                    topic = "obj-storage-ie-${folder}"
                 )
                 consumerScheduler.registerConsumer(consumer)
 
-                l3.putItem(folder, key, content)
+                objectStorage.putItem(folder, key, content)
                 delay(500)
-                val deletedItem = l3.deleteItem(folder, key)
+                val deletedItem = objectStorage.deleteItem(folder, key)
                 delay(500)
                 consumedMessages.size shouldBe 2
                 val itemEvent = Json.decodeFromString(ItemEvent.serializer(), consumedMessages[1].payload)

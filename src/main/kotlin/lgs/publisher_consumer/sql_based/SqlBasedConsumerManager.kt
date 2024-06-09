@@ -1,12 +1,12 @@
-package lgs.machado.sql_based
+package lgs.publisher_consumer.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
-import lgs.machado.Consumer
-import lgs.machado.core.ConsumerManager
-import lgs.machado.Message
+import lgs.publisher_consumer.Consumer
+import lgs.publisher_consumer.Message
+import lgs.publisher_consumer.core.ConsumerManager
 import org.jetbrains.exposed.sql.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,7 +29,7 @@ class SqlBasedConsumerManager(
 
         // Todo: DLQ failures eventually?
         val failures = consumer.consumeMessages(messages)
-        logger.debug("Failed to consume ${failures.size} messages on topic ${consumer.topic()} for group ${consumer.group()}")
+        logger.debug("Failed to consume ${failures.size} messages on topic ${consumer.topic} for group ${consumer.group}")
         val failedMessageIds = failures.map { it.failedMessageId }
         val successes = messages.map { it.id }
             .filter { !failedMessageIds.contains(it) }
@@ -42,11 +42,11 @@ class SqlBasedConsumerManager(
             MessageTable
                 .join(ConsumerTable, JoinType.LEFT) {
                     (MessageTable.id eq ConsumerTable.messageId) and
-                            (ConsumerTable.topic eq consumer.topic()) and
-                            (ConsumerTable.group eq consumer.group())
+                            (ConsumerTable.topic eq consumer.topic) and
+                            (ConsumerTable.group eq consumer.group)
                 }
                 .selectAll()
-                .where { MessageTable.topic eq consumer.topic() }
+                .where { MessageTable.topic eq consumer.topic }
                 .andWhere { ConsumerTable.consumedAt.isNull() }
                 .orderBy(MessageTable.sentAt to SortOrder.ASC)
                 .limit(maxPollSize)
@@ -57,8 +57,8 @@ class SqlBasedConsumerManager(
     private suspend fun markMessagesAsConsumed(consumer: Consumer, messageIds: List<UUID>) {
         return suspendedTransaction(Dispatchers.IO, db.writer) {
             ConsumerTable.batchInsert(messageIds) { messageId ->
-                this[ConsumerTable.group] = consumer.group()
-                this[ConsumerTable.topic] = consumer.topic()
+                this[ConsumerTable.group] = consumer.group
+                this[ConsumerTable.topic] = consumer.topic
                 this[ConsumerTable.messageId] = messageId
                 this[ConsumerTable.consumedAt] = nowAsEpochMilli()
             }

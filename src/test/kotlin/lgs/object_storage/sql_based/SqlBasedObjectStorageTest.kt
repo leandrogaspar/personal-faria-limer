@@ -1,12 +1,12 @@
-package lgs.l3.sql_based
+package lgs.object_storage.sql_based
 
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
 import lgs.configuration.Databases
-import lgs.l3.Item
-import lgs.machado.Producer
+import lgs.object_storage.Item
+import lgs.publisher_consumer.Producer
 import lgs.test_helpers.cleanDbFile
 import lgs.test_helpers.createTestClock
 import lgs.test_helpers.randomByteArray
@@ -14,9 +14,9 @@ import lgs.test_helpers.randomString
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
-class SqlBasedL3Test(
+class SqlBasedObjectStorageTest(
 ) : ShouldSpec() {
-    private val dbFile = "./dbs/sql_based_l3.db"
+    private val dbFile = "./dbs/sql_based_object_storage.db"
     private val db by lazy {
         cleanDbFile(dbFile)
         DatabaseFactory().createDatabase(dbFile)
@@ -26,7 +26,13 @@ class SqlBasedL3Test(
         override suspend fun produceMessage(topic: String, payload: String) {
         }
     }
-    private val l3 by lazy { SqlBasedL3(db = Databases(db, db), clock = clock, producer = producer) }
+    private val objectStorage by lazy {
+        SqlBasedObjectStorage(
+            db = Databases(db, db),
+            clock = clock,
+            producer = producer
+        )
+    }
 
     override fun afterSpec(f: suspend (Spec) -> Unit) {
         super.afterSpec(f)
@@ -39,7 +45,7 @@ class SqlBasedL3Test(
                 val folder = randomString()
                 val key = randomString()
                 val content = randomByteArray()
-                val item = l3.putItem(folder, key, content)
+                val item = objectStorage.putItem(folder, key, content)
                 item shouldBe Item(
                     folder = folder,
                     key = key,
@@ -56,7 +62,7 @@ class SqlBasedL3Test(
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
                     val content = randomByteArray()
-                    val item = l3.putItem(folder, key, content)
+                    val item = objectStorage.putItem(folder, key, content)
                     item shouldBe Item(
                         folder = folder,
                         key = key,
@@ -75,9 +81,9 @@ class SqlBasedL3Test(
                 val content = randomByteArray()
 
                 val baseInstant = Instant.now(clock)
-                val itemA = l3.putItem(folderA, key, content)
+                val itemA = objectStorage.putItem(folderA, key, content)
                 clock.plus(10.seconds)
-                val itemB = l3.putItem(folderB, key, content)
+                val itemB = objectStorage.putItem(folderB, key, content)
                 itemA shouldBe Item(
                     folder = folderA,
                     key = key,
@@ -104,10 +110,10 @@ class SqlBasedL3Test(
                 val content = randomByteArray()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
-                    l3.putItem(folder, key, content)
+                    objectStorage.putItem(folder, key, content)
                 }
 
-                val item = l3.getItem(folder, key)
+                val item = objectStorage.getItem(folder, key)
                 item shouldBe Item(
                     folder = folder,
                     key = key,
@@ -125,11 +131,11 @@ class SqlBasedL3Test(
                 val content = randomByteArray()
 
                 val baseInstant = Instant.now(clock)
-                l3.putItem(folderA, key, content)
+                objectStorage.putItem(folderA, key, content)
                 clock.plus(10.seconds)
-                l3.putItem(folderB, key, content)
-                val itemA = l3.getItem(folderA, key)
-                val itemB = l3.getItem(folderB, key)
+                objectStorage.putItem(folderB, key, content)
+                val itemA = objectStorage.getItem(folderA, key)
+                val itemB = objectStorage.getItem(folderB, key)
                 itemA shouldBe Item(
                     folder = folderA,
                     key = key,
@@ -149,7 +155,7 @@ class SqlBasedL3Test(
             }
 
             should("return null when key is not found") {
-                val item = l3.getItem(randomString(), randomString())
+                val item = objectStorage.getItem(randomString(), randomString())
                 item shouldBe null
             }
 
@@ -158,12 +164,12 @@ class SqlBasedL3Test(
                 val folder = randomString()
                 val key = randomString()
                 val content = randomByteArray()
-                l3.putItem(folder, key, content)
+                objectStorage.putItem(folder, key, content)
 
                 clock.plus(10.seconds)
-                l3.deleteItem(folder, key)
+                objectStorage.deleteItem(folder, key)
 
-                val item = l3.getItem(folder, key)
+                val item = objectStorage.getItem(folder, key)
                 item shouldBe Item(
                     folder = folder,
                     key = key,
@@ -181,10 +187,10 @@ class SqlBasedL3Test(
                 val content = randomByteArray()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
-                    l3.putItem(folder, key, content)
+                    objectStorage.putItem(folder, key, content)
                 }
 
-                val item = l3.getItem(folder, key, version = 3)
+                val item = objectStorage.getItem(folder, key, version = 3)
                 item shouldBe Item(
                     folder = folder,
                     key = key,
@@ -200,9 +206,9 @@ class SqlBasedL3Test(
                 val key = randomString()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
-                    l3.putItem(folder, key, randomByteArray())
+                    objectStorage.putItem(folder, key, randomByteArray())
                 }
-                val item = l3.getItem(folder, key, version = 8)
+                val item = objectStorage.getItem(folder, key, version = 8)
                 item shouldBe null
             }
         }
@@ -215,10 +221,10 @@ class SqlBasedL3Test(
                 val content = randomByteArray()
                 for (i in (1..5)) {
                     clock.plus(10.seconds)
-                    l3.putItem(folder, key, content)
+                    objectStorage.putItem(folder, key, content)
                 }
                 clock.plus(10.seconds)
-                val item = l3.deleteItem(folder, key)
+                val item = objectStorage.deleteItem(folder, key)
                 item shouldBe Item(
                     folder = folder,
                     key = key,
@@ -236,12 +242,12 @@ class SqlBasedL3Test(
                 val content = randomByteArray()
 
                 val baseInstant = Instant.now(clock)
-                l3.putItem(folderA, key, content)
+                objectStorage.putItem(folderA, key, content)
                 clock.plus(10.seconds)
-                l3.putItem(folderB, key, content)
+                objectStorage.putItem(folderB, key, content)
                 clock.plus(10.seconds)
-                val deletedItemA = l3.deleteItem(folderA, key)
-                val itemB = l3.getItem(folderB, key)
+                val deletedItemA = objectStorage.deleteItem(folderA, key)
+                val itemB = objectStorage.getItem(folderB, key)
                 deletedItemA shouldBe Item(
                     folder = folderA,
                     key = key,
@@ -261,7 +267,7 @@ class SqlBasedL3Test(
             }
 
             should("return null and be no-op if item is not found") {
-                val item = l3.deleteItem(randomString(), randomString())
+                val item = objectStorage.deleteItem(randomString(), randomString())
                 item shouldBe null
             }
         }

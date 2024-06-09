@@ -1,10 +1,10 @@
-package lgs.l3
+package lgs.object_storage
 
 /**
- * L3 - Leandro's Lightweight Locker, AKA Poor Man's S3
+ * ObjectStorage, previously known as L3 - Leandro's Lightweight Locker, AKA Poor Man's S3
  * Basically my own, dumb, riskier, and production unsafe blob storage.
  */
-interface L3 {
+interface ObjectStorage {
     /**
      * Stores [content] under [folder] / [key].
      * If it is the first time the [folder] / [key] is being used, the created [Item] will have [Item.version] 1.
@@ -29,7 +29,7 @@ interface L3 {
      * Soft deletes [Item] under the specified [folder] / [key].
      * If there is no [Item] for the given [folder] / [key], this is a no-op.
      * If the [key] is found, the [Item.deletedAt] timestamp is updated.
-     * There is no hard delete in L3 and a deleted [Item] will still appear on [L3.getItem] calls.
+     * There is no hard delete in ObjectStorage and a deleted [Item] will still appear on [ObjectStorage.getItem] calls.
      * @param [key] the unique key for the desired item.
      * @param [key] the unique key for the desired item.
      * @return the deleted [Item] or null if none was found.

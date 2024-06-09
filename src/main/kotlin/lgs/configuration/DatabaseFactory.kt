@@ -4,9 +4,9 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.micronaut.context.annotation.Factory
 import jakarta.inject.Singleton
-import lgs.l3.sql_based.ItemTable
-import lgs.machado.sql_based.ConsumerTable
-import lgs.machado.sql_based.MessageTable
+import lgs.object_storage.sql_based.ItemTable
+import lgs.publisher_consumer.sql_based.ConsumerTable
+import lgs.publisher_consumer.sql_based.MessageTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils

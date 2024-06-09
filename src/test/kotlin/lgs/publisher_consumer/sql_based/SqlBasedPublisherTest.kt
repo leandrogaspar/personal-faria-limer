@@ -1,4 +1,4 @@
-package lgs.machado.sql_based
+package lgs.publisher_consumer.sql_based
 
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.ShouldSpec

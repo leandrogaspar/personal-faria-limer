@@ -1,26 +1,26 @@
-package lgs.l3.sql_based
+package lgs.object_storage.sql_based
 
 import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
-import lgs.l3.L3
-import lgs.l3.Item
-import lgs.l3.toItemEvent
-import lgs.machado.Producer
+import lgs.object_storage.Item
+import lgs.object_storage.ItemEvent
+import lgs.object_storage.ObjectStorage
+import lgs.object_storage.toItemEvent
+import lgs.publisher_consumer.Producer
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import java.time.Clock
 import java.time.Instant
 
 @Singleton
-class SqlBasedL3(
+class SqlBasedObjectStorage(
     private val clock: Clock,
     private val db: Databases,
     private val producer: Producer,
-) : L3 {
+) : ObjectStorage {
     override suspend fun putItem(folder: String, key: String, content: ByteArray): Item {
         return suspendedTransaction(Dispatchers.IO, db.writer) {
             val existingItem = ItemTable.selectAll()
@@ -42,7 +42,7 @@ class SqlBasedL3(
                 .where { (ItemTable.folder eq folder) and (ItemTable.key eq key) and (ItemTable.version eq newVersion) }
                 .limit(1)
                 .first().item()
-            producer.produceMessage(topicForItem(item), Json.encodeToString(item.toItemEvent()))
+            producer.produceMessage(topicForItem(item), Json.encodeToString(ItemEvent.serializer(), item.toItemEvent()))
             item
         }
     }
@@ -88,11 +88,11 @@ class SqlBasedL3(
                 }
                 .limit(1)
                 .first().item()
-            producer.produceMessage(topicForItem(item), Json.encodeToString(item.toItemEvent()))
+            producer.produceMessage(topicForItem(item), Json.encodeToString(ItemEvent.serializer(), item.toItemEvent()))
             item
         }
     }
 
-    private fun topicForItem(item: Item): String = "l3-ie-${item.folder}"
+    private fun topicForItem(item: Item): String = "obj-storage-ie-${item.folder}"
     private fun nowAsEpochMilli() = Instant.now(clock).toEpochMilli()
 }

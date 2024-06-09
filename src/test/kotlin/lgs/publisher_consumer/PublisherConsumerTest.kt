@@ -1,4 +1,4 @@
-package lgs.machado
+package lgs.publisher_consumer
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
@@ -6,7 +6,7 @@ import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import lgs.machado.core.ConsumerScheduler
+import lgs.publisher_consumer.core.ConsumerScheduler
 import lgs.test_helpers.createTrackingConsumer
 import lgs.test_helpers.randomString
 import java.time.Instant
@@ -18,12 +18,12 @@ import kotlin.time.measureTime
 
 
 @MicronautTest
-class MachadoTest(
+class PublisherConsumerTest(
     private val producer: Producer,
     private val consumerScheduler: ConsumerScheduler,
 ) : ShouldSpec() {
     init {
-        context("Machado") {
+        context("Publisher & Consumer") {
             should("send and consume messages") {
                 val topic = randomString()
                 val consumedMessages = mutableListOf<Message>()
@@ -42,7 +42,7 @@ class MachadoTest(
         }
 
         // Todo: refactor this. I made this as a quick hack to test it a bit, but it needs love
-        should("test") {
+        should("Publisher & Consumer Load Test") {
             val parallelism = Runtime.getRuntime().availableProcessors()
             val dispatcher = Executors.newFixedThreadPool(parallelism)
                 .asCoroutineDispatcher()
@@ -69,9 +69,7 @@ class MachadoTest(
                     }
                 }
             }
-            val consumer = object : Consumer {
-                override fun group() = group
-                override fun topic() = topic
+            val consumer = object : Consumer(group, topic) {
                 override suspend fun consumeMessages(messages: List<Message>): List<ConsumeFailure> {
                     messages.forEach {
                         asyncLatencies[it.payload] = Pair(asyncLatencies[it.payload]!!.first, Instant.now())

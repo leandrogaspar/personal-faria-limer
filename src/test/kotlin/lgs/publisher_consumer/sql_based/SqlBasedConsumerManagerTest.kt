@@ -1,12 +1,12 @@
-package lgs.machado.sql_based
+package lgs.publisher_consumer.sql_based
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
 import lgs.configuration.Databases
-import lgs.machado.ConsumeFailure
-import lgs.machado.Consumer
-import lgs.machado.Message
+import lgs.publisher_consumer.ConsumeFailure
+import lgs.publisher_consumer.Consumer
+import lgs.publisher_consumer.Message
 import lgs.test_helpers.cleanDbFile
 import lgs.test_helpers.createTestClock
 import lgs.test_helpers.createTrackingConsumer
@@ -29,7 +29,7 @@ class SqlBasedConsumerManagerTest(
             should("consume pending messages prioritizing older messages up to maxPollSize") {
                 val consumedMessages = mutableListOf<Message>()
                 val consumer = createTrackingConsumer(consumedMessages)
-                val sentMessages = sendMessages(consumer.topic(), 3)
+                val sentMessages = sendMessages(consumer.topic, 3)
 
                 consumerManager.consumeMessages(consumer, 1)
                 consumedMessages.size shouldBe 1
@@ -39,7 +39,7 @@ class SqlBasedConsumerManagerTest(
             should("consume all pending messages prioritizing older messages") {
                 val consumedMessages = mutableListOf<Message>()
                 val consumer = createTrackingConsumer(consumedMessages)
-                val sentMessages = sendMessages(consumer.topic(), 3)
+                val sentMessages = sendMessages(consumer.topic, 3)
 
                 consumerManager.consumeMessages(consumer, 10)
                 consumedMessages.size shouldBe 3
@@ -58,18 +58,15 @@ class SqlBasedConsumerManagerTest(
             should("keep failures available for consume") {
                 val shouldFailMessage = "should_fail"
                 val messagesReceivedOnConsumer = mutableListOf<Message>()
-                val consumer = object : Consumer {
-                    private val topicAndGroup = randomString()
-                    override fun group() = topicAndGroup
-                    override fun topic() = topicAndGroup
+                val consumer = object : Consumer(randomString(), randomString()) {
                     override suspend fun consumeMessages(messages: List<Message>): List<ConsumeFailure> {
                         messagesReceivedOnConsumer.addAll(messages)
                         return messages.filter { it.payload == shouldFailMessage }
                             .map { ConsumeFailure(it.id, "It failed!") }
                     }
                 }
-                publisher.produceMessage(consumer.topic(), shouldFailMessage)
-                sendMessages(consumer.topic(), 4)
+                publisher.produceMessage(consumer.topic, shouldFailMessage)
+                sendMessages(consumer.topic, 4)
 
                 // The first poll, we get the message that should fail + 4 that should pass
                 consumerManager.consumeMessages(consumer, 10)

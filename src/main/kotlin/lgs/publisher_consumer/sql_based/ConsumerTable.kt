@@ -1,4 +1,4 @@
-package lgs.machado.sql_based
+package lgs.publisher_consumer.sql_based
 
 import org.jetbrains.exposed.sql.Table
 
