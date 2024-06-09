@@ -41,6 +41,7 @@ class MachadoTest(
             }
         }
 
+        // Todo: refactor this. I made this as a quick hack to test it a bit, but it needs love
         should("test") {
             val parallelism = Runtime.getRuntime().availableProcessors()
             val dispatcher = Executors.newFixedThreadPool(parallelism)
