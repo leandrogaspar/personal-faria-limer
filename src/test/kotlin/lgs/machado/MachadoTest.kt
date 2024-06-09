@@ -6,7 +6,7 @@ import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import lgs.machado.model.Message
+import lgs.machado.core.ConsumerScheduler
 import lgs.test_helpers.createTrackingConsumer
 import lgs.test_helpers.randomString
 import java.time.Instant

@@ -5,7 +5,7 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import lgs.configuration.DatabaseFactory
 import lgs.configuration.Databases
-import lgs.l3.model.Item
+import lgs.l3.Item
 import lgs.machado.Producer
 import lgs.test_helpers.cleanDbFile
 import lgs.test_helpers.createTestClock

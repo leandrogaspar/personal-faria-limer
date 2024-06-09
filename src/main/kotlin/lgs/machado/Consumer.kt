@@ -1,6 +1,5 @@
 package lgs.machado
 
-import lgs.machado.model.Message
 import java.util.*
 
 data class ConsumeFailure(

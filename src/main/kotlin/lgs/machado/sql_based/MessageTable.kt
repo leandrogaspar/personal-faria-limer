@@ -1,6 +1,6 @@
 package lgs.machado.sql_based
 
-import lgs.machado.model.Message
+import lgs.machado.Message
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import java.time.Instant

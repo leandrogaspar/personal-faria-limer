@@ -5,9 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.micronaut.test.extensions.kotest5.annotation.MicronautTest
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
-import lgs.l3.model.ItemEvent
-import lgs.machado.ConsumerScheduler
-import lgs.machado.model.Message
+import lgs.machado.core.ConsumerScheduler
+import lgs.machado.Message
 import lgs.test_helpers.createTrackingConsumer
 import lgs.test_helpers.randomByteArray
 import lgs.test_helpers.randomString

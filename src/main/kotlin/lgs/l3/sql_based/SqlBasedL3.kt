@@ -7,8 +7,8 @@ import kotlinx.serialization.json.Json
 import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
 import lgs.l3.L3
-import lgs.l3.model.Item
-import lgs.l3.model.toItemEvent
+import lgs.l3.Item
+import lgs.l3.toItemEvent
 import lgs.machado.Producer
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob

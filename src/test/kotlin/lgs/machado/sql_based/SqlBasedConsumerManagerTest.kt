@@ -6,7 +6,7 @@ import lgs.configuration.DatabaseFactory
 import lgs.configuration.Databases
 import lgs.machado.ConsumeFailure
 import lgs.machado.Consumer
-import lgs.machado.model.Message
+import lgs.machado.Message
 import lgs.test_helpers.cleanDbFile
 import lgs.test_helpers.createTestClock
 import lgs.test_helpers.createTrackingConsumer

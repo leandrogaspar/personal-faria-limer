@@ -2,7 +2,7 @@ package lgs.test_helpers
 
 import lgs.machado.ConsumeFailure
 import lgs.machado.Consumer
-import lgs.machado.model.Message
+import lgs.machado.Message
 
 /**
  * @return a consumer that adds all received messages to the [consumedMessagesTracker] list

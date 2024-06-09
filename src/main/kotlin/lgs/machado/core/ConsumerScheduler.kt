@@ -1,4 +1,4 @@
-package lgs.machado
+package lgs.machado.core
 
 import io.micronaut.context.ApplicationContext
 import io.micronaut.scheduling.annotation.Scheduled
@@ -7,7 +7,7 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import lgs.machado.core.ConsumerManager
+import lgs.machado.Consumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap

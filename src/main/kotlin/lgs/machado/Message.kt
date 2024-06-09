@@ -1,4 +1,4 @@
-package lgs.machado.model
+package lgs.machado
 
 import java.time.Instant
 import java.util.*

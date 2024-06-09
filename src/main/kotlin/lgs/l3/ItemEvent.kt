@@ -1,6 +1,6 @@
 @file:UseSerializers(InstantSerializer::class)
 
-package lgs.l3.model
+package lgs.l3
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

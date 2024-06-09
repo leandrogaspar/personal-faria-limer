@@ -6,7 +6,7 @@ import lgs.configuration.Databases
 import lgs.configuration.suspendedTransaction
 import lgs.machado.Consumer
 import lgs.machado.core.ConsumerManager
-import lgs.machado.model.Message
+import lgs.machado.Message
 import org.jetbrains.exposed.sql.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

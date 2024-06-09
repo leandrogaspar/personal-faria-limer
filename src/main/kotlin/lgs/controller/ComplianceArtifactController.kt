@@ -9,7 +9,7 @@ import jakarta.inject.Singleton
 import lgs.l3.L3
 import lgs.machado.ConsumeFailure
 import lgs.machado.Consumer
-import lgs.machado.model.Message
+import lgs.machado.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
